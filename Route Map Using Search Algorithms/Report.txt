@@ -1,0 +1,122 @@
+Problem 1:
+To find a routing path between initial city and goal city based on routing algorithm and cost function
+
+Assumption - Car can travel on ferries. So, the driving time and distance across ferry routes taken as 0 (i.e, the driver
+             has to put no efforts)
+
+Algorithms:
+Breadth First Search (bfs)
+Depth First Search (dfs)
+A star Algorithm
+Uniform Cost Algorithm
+
+Cost:
+Total Distance Travelled
+Total Time taken
+Total No. of turns/edges in the graph
+
+Abstraction:
+Initial State - The initial city
+Goal State - The goal City
+State Space - All the cities
+Successor function - from any state, gives the next city it can travel to directly by road highway
+                     Predecessor is not taken in the successor
+Cost Function - Depends on the user input
+Heuristic Function- Its calculated as Heuristic Distance / Cost Factor.
+
+    
+
+Questions:
+1. Which Search Algorithm seems to work best for each routing option?
+
+Since there maybe few errors in the data, there is a high chance that Heuristic search will throw the same result as Uniform cost search,
+or it maybe few miles off. Heuristic search explores comparitively less branches and less number of cities.
+For example, including the revisits, from Abbot_Village,_Maine to Abbotsford,_Wisconsin
+Astar algorithm visited 3288 cities
+Uniform Search algorithm visited 3348 cities 
+
+2. Which algorithm is fastest in terms of computational time?
+
+In some cases, A Star is taking less amount of time, but minimal difference
+eg:
+Atar from Abbot_Village,_Maine to Abbotsford,_Wisconsin      
+0.403 seconds
+Uniform:
+0.413 seconds
+BFS: 
+0.411 seconds
+DFS:
+0.416 seconds
+
+But it may vary when Heuristic is not consistent and would have to re explore many cities.
+
+
+3. Which algorithm requires least memory?
+
+Length of Fringe max:
+Astar = 99
+Uniform=84
+BFS=151
+DFS=151
+
+However, you have to keep track of visited states in Uniform.
+Also, Heuristic is not always consistent.
+If Heuristic function if consistent will definitely require least memory.
+
+4. Heuristic Function- how good it is?
+
+Heuristic Function- Its calculated as Heuristic Distance / Cost Factor.
+
+Heuristic Distance - It's the Great Circle distance from any city to the goal city
+Ideal cases, where Data is given correctly, with all cities' latitude and longitude given,
+Heuristic Distance is consistent.
+
+When Latitude/Longitude of current city is not given:
+Heuristic distance is calculated from the previous city as the formula:
+(Heuristic Distance of Previous city to the goal) - (Distance travelled from previous city to the current city)
+The above is admissible, since that's the minimum value the actual heuristic distance from that point
+
+Eg: If Initial city is Keystone_Crossing,_Indiana, Goal City is Bloomington,_Indiana
+and we travel initially Keystone_Crossing,_Indiana -> Indianapolis,_Indiana -> Jct_I-65_&_I-465_S,_Indiana
+For Jct_I-65_&_I-465_S,_Indiana, we don't have latitude longitude.
+If Heuristic Distance from Indianapolis to Bloomington=x
+And distance between Indianapolis and Jct_I-65_&_I-465_S,_Indiana =d
+Then Heuristic Distance from Jct_I-65_&_I-465_S,_Indiana to Bloomington is calculated as
+h=x-d
+If h<0. it's taken as 0
+
+When Latitude/Longitude of goal city is not given, we find the nearest city to the goal city whose latitude/longitude
+is given. The nearest city is found similar to uniform search algorithm from the goal city, where goal is considered as reached if 
+city with latitude data is reached. We record the distance traversed to this city as "Distance Coordinate". Let the nearest city be "X"
+
+In this case, heuristic from any city to the goal city= (heuristic distance to the city "X" - Distance Coordinate)
+The above is also admissible, as that is the minimum value actual heuristic distance will be
+
+Cost Factor - If we are measuring cost in terms of time, cost factor is maximum speed limit. 
+So in this case heuristic= heuristic distance/max speed limit , as this is the minimum time you can reach to the goal.
+
+If cost in terms of no. of turns / segments
+Cost factor = maximum length of road segment.
+So heuristic= heuristic distance / max_segment_length , as this is the minimum no. of turns you have to take
+
+Heuristic distance, which we are calculating using Haversine formula, is admissible, even in case where latitude and longitude is not given
+But it's not consistent always, because we are giving lower values to heuristic distance to the cities with no latitude/longitude,
+and so there is a chance of triangle inequality
+
+So, for A star algorithm, we use search algorithm 2 with admissible heuristic, where we may have to revisit the branches and cities
+if we find cost + heuristic to be minimum 
+
+Note: In some cases, route map has distances to other cities wrong, thus making Heuristic distance inadmissible for those points
+For example:
+Bethel,_Indiana : (Latitude,Longitude) = (39.9867145, -84.830281)
+Fort_Wayne,_Indiana: (Latitude,Longitude)= (41.079273, -85.1393513)
+
+Great circle distance comes as 77 miles
+But shortest distance comes as 59 miles
+Bethel,_Indiana->Markle,_Indiana = 37
+Markle,_Indiana->Jct_I-69_&_I-469_S,_Indiana = 10
+Jct_I-69_&_I-469_S,_Indiana->Aboite,_Indiana = 5
+Aboite,_Indiana->Fort_Wayne,_Indiana = 7
+
+This is data error.
+To compromise for this, Heuristic Distance has been multiplied by 0.5 (may not work for all cases if too much data error)            
